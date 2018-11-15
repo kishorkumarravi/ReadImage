@@ -9,7 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author kravi
@@ -28,24 +31,31 @@ public class ReadImageServiceImpl implements ReadImageService {
 
         /*File imageFile = new File(file);*/
 
-        if (file.exists()) {
+        File file1 = new File("/Users/kravi/Downloads/33.png");
+
+        //public File img = new File("imagen.png");
+
+        BufferedImage buffImg =
+                new BufferedImage(240, 240, BufferedImage.TYPE_INT_ARGB);
+
+        try {
+            buffImg = ImageIO.read(file1);
+        }
+        catch (IOException e) { }
+
+        System.out.println(buffImg.getType()); //Prints 0 instead of 2
+
+
+        if (file1.exists()) {
             ITesseract tesseract = new Tesseract();
 
-            String result = tesseract.doOCR(file);
+            String result = tesseract.doOCR(buffImg);
             System.out.println(result);
         }
         else {
             System.out.println("File not found!!!");
         }
 
-        ITesseract instance = new Tesseract();
-        try {
-            convertedText = instance.doOCR(file);
-
-        } catch (TesseractException e) {
-            System.err.println(e.getMessage());
-            return "Error while reading image";
-        }
 
         return convertedText;
     }

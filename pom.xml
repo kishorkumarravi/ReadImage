@@ -54,7 +54,23 @@
 			<version>4.3.0</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.aspose/aspose-ocr
+		<dependency>
+			<groupId>com.aspose</groupId>
+			<artifactId>aspose-ocr</artifactId>
+			<version>17.11</version>
+		</dependency>-->
 
+
+		<!-- https://mvnrepository.com/artifact/com.aspose/aspose-ocr -->
+		<!-- https://mvnrepository.com/artifact/com.aspose/aspose-ocr -->
+
+
+		<!--<dependency>
+			<groupId>net.sourceforge.tess4j</groupId>
+			<artifactId>tess4j</artifactId>
+			<version>3.2.1</version>
+		</dependency>-->
 
 
 	</dependencies>
