@@ -1,0 +1,97 @@
+import com.cloudbees.plugins.credentials.CredentialsProvider
+import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials
+import org.jenkinsci.plugins.gitclient.Git
+import org.jenkinsci.plugins.gitclient.GitClient
+import org.eclipse.jgit.transport.URIish;
+
+env_branch_name = env.BRANCH_NAME
+env_job_name = env.JOB_NAME
+env_build_number = env.BUILD_NUMBER
+YELLOW = "#FFFF00"
+GREEN  = "#ADFF2F"
+RED = "#F08080"
+PURPLE = "#800080"
+
+def hipChatSend(hipColor, hipMessage) {
+    m = "Read Image -> ${env_branch_name}-${env_build_number} ::: Stage: ${hipMessage}"
+    slackSend channel: '#jenkinstest', color: hipColor, message: m, teamDomain: 'teamChennai', token: 'DG5pQ0un2JxioDucMYAXU0fd'
+}
+
+
+def excuteNodeBranch(folder, binaryName) {
+
+    hipChatSend(YELLOW, "Starting readImage Build")
+    stage ('Checkout') {
+        checkout scm
+
+        filename = 'src/main/resources/application.properties'
+        data = readYaml file: filename
+
+        // Change something in the file
+        data.info.build.branch = env_branch_name
+        data.info.build.buildNumber = env_build_number
+
+        sh "rm $filename"
+        writeYaml file: filename, data: data
+
+        sh "cat $filename"
+
+
+        stage ("Unit test") {
+            sh "pwd"
+            sh "ls -ltr"
+            sh "sudo /var/lib/dpkg/info/ca-certificates-java.postinst configure"
+            sh "make test"
+        }
+
+
+        stage ("Publish Junit Report") {
+
+            sh "pwd"
+            sh "ls -altr"
+            junit healthScaleFactor: 2, testResults: 'build/test-results/test/*.xml'
+            jacoco execPattern: 'build/jacoco/**.exec'
+        }
+
+        stage ('Docker build') {
+            def buildNumberImage = docker.build('readImage:'+env_build_number)
+
+
+            }
+
+
+        }
+
+    }
+}
+
+def nodeJS() {
+    node('nodejs')
+    {
+        try {
+
+            stage("Preparing"){
+                sh'''#!/bin/bash -xe
+                    colls=( Kishor kumar ravi )
+                    for eachCol in ${colls[@]}
+                    do
+                      echo $eachCol
+                    done
+                '''
+            }
+
+            stage ('Starting worker node') { excuteNodeBranch('./', 'readImage') }
+        }
+        catch (error) {
+            hipChatSend(RED, "Failed NodeJs Build. ${error}")
+            throw error
+        }
+    }
+}
+
+if (env_branch_name == "master")  {
+    stage ('Connect to Jenkins Node') {
+        hipChatSend(YELLOW, "Starting Jenkins Slave Node")
+        nodeJS()
+    }
+}
