@@ -35,7 +35,6 @@ public class ReadImageController {
      * This method reads the content present in an image
      * @return String This returns string content present in the incoming image
      */
-    //@ApiOperation(value = "Get all ActivityLogResponse")
     @RequestMapping(value = "all", method = POST)
     @ResponseBody
     public String readImage(@RequestParam("file") MultipartFile multipartFile) throws TesseractException, IOException {
